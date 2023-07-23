@@ -24,9 +24,19 @@ set -e
 # define internal flags
 CSV=0    # csv output: off
 
-case "$1" in
-  --help|-h)
-    cat >&2 <<.e
+# define short options
+OPTIONS="hc"
+
+# define corresponding long options
+LONGOPTIONS=("help,csv")
+
+# read command-line arguments
+CMDARGUMENTS=$(getopt -o "$OPTIONS" --long "$LONGOPTIONS")
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in 
+    -h | --help)
+      cat >&2 <<.e
 Lists all installed packages (dpkg -l similar format) and prints their licenses
 
 Usage: $0 [-c]
@@ -35,12 +45,18 @@ Options:
     -c, --csv    use comma separated values (CSV) output format
     -h, --help   print this message
 .e
-    exit 1
-    ;;
-  --csv|-c)
-    CSV=1
-    ;;
-esac
+      exit 1
+      ;;
+    -c | --csv)
+      CSV=1
+      shift
+      ;;
+    *)
+      echo "unrecognized option: $1"
+      exit 2
+      ;;
+  esac
+done
 
 SCRIPTLIB=$(dirname $(readlink -f "$0"))/lib/
 test -d "$SCRIPTLIB"
