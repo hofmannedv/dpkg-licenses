@@ -21,7 +21,8 @@
 
 set -e
 
-CSV=0
+# define internal flags
+CSV=0    # csv output: off
 
 case "$1" in
   --help|-h)
