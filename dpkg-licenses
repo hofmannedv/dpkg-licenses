@@ -132,43 +132,11 @@ script_run_info(){
 #% SYNOPSIS
 #+    ${SCRIPT_NAME} [-hv] [-i [file]]
 #%
-#% DESCRIPTION
-#%    Markdown scripts are transformed to add a table of contents,
-#%    number the pages, build and include a diagram to the hard-coded outputfile
-#%    to create the book as a PDF file, php-introduction.pdf
-#%
-#% OPTIONS
-#%    -i [file], --output=[file]    Set input source file
-#%    -h, --help                    Print this help
-#%    -v, --version                 Print script information
-#%
+
 #% EXAMPLES
 #%    ${SCRIPT_NAME} -i 
 #%
-#% PREREQUISITES
-#% for first time use on a new machine running Debian use the following:
-#% apt-get install ruby-full bc original-awk
-#% gem update --system
-#% gem install asciidoctor-diagram rouge asciidoctor-pdf
-#================================================================
-#- IMPLEMENTATION
-#-    Version         ${SCRIPT_NAME} 0.0.6
-#-    Author          Frank Hofmann frank.hofmann@efho.de
-#-    Copyright       (c) Frank Hofmann 2020
-#-    License         GNU General Public License version 3 or later
-#-    script_id       0
-#-
-#================================================================
-#
-# HISTORY
-# 2020-04-02 : geroldr@bluewin.ch rewrite inspired by  Michel VONGVILAY  (https://www.uxora.com)
-#
-#  DEBUG OPTION
-#    set -n  # Uncomment to check your syntax, without execution.
-#    set -x  # Uncomment to debug this shell script
-#================================================================
-# END_OF_HEADER
-#================================================================
+
 
 #============================
 #  FILES AND VARIABLES
