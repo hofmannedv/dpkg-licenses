@@ -112,7 +112,7 @@ echo   "# script name --->  ${0##*/} "
 print_runtime(){
 # end of work wall clock running time calculation
 res2=$(date +%s.%N)
-dt=$(echo "$res2 - $res1" | bc)
+dt=$(echo "$res2 - $res1" | bc) # res1 is set when main function is run
 dd=$(echo "$dt/86400" | bc)
 dt2=$(echo "$dt-86400*$dd" | bc)
 dh=$(echo "$dt2/3600" | bc)
