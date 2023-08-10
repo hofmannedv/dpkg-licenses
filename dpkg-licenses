@@ -23,6 +23,9 @@
 #% https://www.gnu.org/software/parallel/
 #% sudo apt install parallel
 #% 
+#% GNU parallel uses Perl, and the Perl modules Getopt::Long, IPC::Open3, Symbol, IO::File, POSIX, and File::Temp.
+#% For --csv it uses the Perl module Text::CSV.
+#% For remote usage it uses rsync with ssh.
 #% 
 #================================================================
 #- IMPLEMENTATION
@@ -383,7 +386,7 @@ main "$@"
 exit 0
 # A zero return value from the script on exit indicates success to the shell.
 
-# sudo apt install parallel
+
 # parallel tutorial https://zenodo.org/record/1146014
 parallel --jobs 24 \
          --dry-run  \
