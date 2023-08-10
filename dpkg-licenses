@@ -129,15 +129,6 @@ script_run_info(){
     print_runtime
 }
 
-#% SYNOPSIS
-#+    ${SCRIPT_NAME} [-hv] [-i [file]]
-#%
-
-#% EXAMPLES
-#%    ${SCRIPT_NAME} -i 
-#%
-
-
 #============================
 #  FILES AND VARIABLES
 #============================
