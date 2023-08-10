@@ -1,5 +1,39 @@
 #!/bin/bash
-#
+#================================================================
+# HEADER
+#================================================================
+#% TITLE    dpkg-licenses
+#% SYNOPSIS
+#+    ${SCRIPT_NAME} [-hcv] [-i [file]]
+#%
+#% DESCRIPTION
+#%    
+#%    
+#%    
+#%
+#% OPTIONS
+#%    -i [file], --output=[file]    Set input source file
+#%    -h, --help                    Print this help
+#%    -v, --version                 Print script information
+#%
+#% EXAMPLES
+#%    ${SCRIPT_NAME} -i 
+#%
+#% PREREQUISITES
+#% https://www.gnu.org/software/parallel/
+#% sudo apt install parallel
+#% 
+#% 
+#================================================================
+#- IMPLEMENTATION
+#-    Version         ${SCRIPT_NAME} 0.0.1
+#-    Authors          Frank Hofmann frank.hofmann@efho.de
+#-                     Gerold Rupprecht geroldr@bluewin.ch
+#-    Copyright       (c) Frank Hofmann and Gerold Rupprecht 2023
+#-    License         GNU General Public License version 3 or later
+#-    script_id       0
+#-
+#    based on original work by
 #    Copyright 2016 Daniel Alder, https://github.com/daald
 #
 #    This file is part of dpkg-licenses.
@@ -18,8 +52,244 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with dpkg-licenses.  If not, see <http://www.gnu.org/licenses/>.
+#================================================================
+#
+# HISTORY
+# 2023-07-23 : new version of dpkg-licenses 
+# 2020-04-02 : geroldr@bluewin.ch rewrite inspired by  Michel VONGVILAY  (https://www.uxora.com)
+#
+#  DEBUG OPTION
+#    set -n  # Uncomment to check your syntax, without execution.
+#    set -x  # Uncomment to debug this shell script
+#================================================================
+# END_OF_HEADER
+#================================================================
 
-set -e
+set -e  # immediately exit if any command has a non-zero exit status
+set -u  # any previously undefined variable - with the exceptions of $* and $@ - is an error
+set -o pipefail  # prevent errors in a pipeline being masked
+
+# Remember to always put double quotes around variable substitutions and command substitutions: "$foo", "$(foo)".
+# Note: pipes tend to be faster than temporary files
+
+script_path() {
+  pushd . > /dev/null
+  SCRIPT_PATH="${BASH_SOURCE[0]}"
+  if [ -h "${SCRIPT_PATH}" ]; then
+      while [ -h "${SCRIPT_PATH}" ]; do
+	  cd "$(dirname "$SCRIPT_PATH")"; 
+          SCRIPT_PATH=`readlink "${SCRIPT_PATH}"`;
+      done
+  fi
+  cd `dirname ${SCRIPT_PATH}` > /dev/null
+  SCRIPT_PATH=`pwd`;
+  popd  > /dev/null
+}
+
+mydebug_info(){
+  echo "pwd: `pwd`"
+  echo "\$0: $0"
+  echo "basename: `basename $0`"
+  echo "dirname: `dirname $0`"
+  echo "dirname/readlink: $(dirname $(readlink -f $0))"
+  script_path
+### Print total arguments and their values
+ 
+  echo "Total Arguments:" $#
+  echo "All Arguments values:" $@
+}
+
+# -----------------------------------------------------------------
+print_script_name_and_path() {
+mydebug_info
+
+echo   "# script name --->  ${0##*/} "
+}
+
+print_runtime(){
+# end of work wall clock running time calculation
+res2=$(date +%s.%N)
+dt=$(echo "$res2 - $res1" | bc)
+dd=$(echo "$dt/86400" | bc)
+dt2=$(echo "$dt-86400*$dd" | bc)
+dh=$(echo "$dt2/3600" | bc)
+dt3=$(echo "$dt2-3600*$dh" | bc)
+dm=$(echo "$dt3/60" | bc)
+ds=$(echo "$dt3-60*$dm" | bc)
+
+printf "# Total runtime: %d:%02d:%02d:%02.4f\n" "$dd" "$dh" "$dm" "$ds"
+}    
+
+script_run_info(){
+    print_script_name_and_path
+    print_runtime
+}
+
+#% SYNOPSIS
+#+    ${SCRIPT_NAME} [-hv] [-i [file]]
+#%
+#% DESCRIPTION
+#%    Markdown scripts are transformed to add a table of contents,
+#%    number the pages, build and include a diagram to the hard-coded outputfile
+#%    to create the book as a PDF file, php-introduction.pdf
+#%
+#% OPTIONS
+#%    -i [file], --output=[file]    Set input source file
+#%    -h, --help                    Print this help
+#%    -v, --version                 Print script information
+#%
+#% EXAMPLES
+#%    ${SCRIPT_NAME} -i 
+#%
+#% PREREQUISITES
+#% for first time use on a new machine running Debian use the following:
+#% apt-get install ruby-full bc original-awk
+#% gem update --system
+#% gem install asciidoctor-diagram rouge asciidoctor-pdf
+#================================================================
+#- IMPLEMENTATION
+#-    Version         ${SCRIPT_NAME} 0.0.6
+#-    Author          Frank Hofmann frank.hofmann@efho.de
+#-    Copyright       (c) Frank Hofmann 2020
+#-    License         GNU General Public License version 3 or later
+#-    script_id       0
+#-
+#================================================================
+#
+# HISTORY
+# 2020-04-02 : geroldr@bluewin.ch rewrite inspired by  Michel VONGVILAY  (https://www.uxora.com)
+#
+#  DEBUG OPTION
+#    set -n  # Uncomment to check your syntax, without execution.
+#    set -x  # Uncomment to debug this shell script
+#================================================================
+# END_OF_HEADER
+#================================================================
+
+#============================
+#  FILES AND VARIABLES
+#============================
+
+  #== general variables ==#
+SCRIPT_NAME="$(basename ${0})" # scriptname without path
+echo "SCRIPT_NAME is ${SCRIPT_NAME}"
+script_path
+SCRIPT_DIR=${SCRIPT_PATH} # script directory
+echo "SCRIPT_PATH is ${SCRIPT_PATH}"
+SCRIPT_FULLPATH=${SCRIPT_DIR}/${SCRIPT_NAME}
+echo "SCRIPT_FULLPATH is ${SCRIPT_FULLPATH}"
+SCRIPT_HEADSIZE=$(head -200 ${0} |grep --no-messages --line-number "^# END_OF_HEADER" | cut --fields=1 --delimiter=:)
+echo "SCRIPT_HEADSIZE = $SCRIPT_HEADSIZE"
+
+scriptinfo() {
+        headFilter="^#-"
+	[[ "$1" = "usg" ]] && headFilter="^#+"
+	[[ "$1" = "ful" ]] && headFilter="^#[%+]"
+	[[ "$1" = "ver" ]] && headFilter="^#-"
+	echo $headFilter
+	head -${SCRIPT_HEADSIZE:-99} ${0} | grep -e "${headFilter}" | sed -e "s/${headFilter}//g" -e "s/\${SCRIPT_NAME}/${SCRIPT_NAME}/g";
+	     }
+
+SCRIPT_ID="$(scriptinfo "ver" | grep script_id | tr -s ' ' | cut -d' ' -f3)"
+#SCRIPT_ID="$( head -${SCRIPT_HEADSIZE:-99} ${0}|grep script_id ${0} | tr -s ' ' | cut -d' ' -f3)"
+echo "SCRIPT_ID is ${SCRIPT_ID}"
+SCRIPT_UNIQ="${SCRIPT_NAME%.*}.${SCRIPT_ID}.${HOSTNAME%%.*}"
+echo "SCRIPT_UNIQ is ${SCRIPT_UNIQ}"
+SCRIPT_UNIQ_DATED="${SCRIPT_UNIQ}.$(date "+%y%m%d%H%M%S").${$}"
+echo "SCRIPT_UNIQ_DATED is ${SCRIPT_UNIQ_DATED}"
+SCRIPT_DIR_TEMP="/tmp" # Make sure temporary folder is RW
+echo "SCRIPT_DIR_TEMP is ${SCRIPT_DIR_TEMP}"
+SCRIPT_DIR_LOCK="${SCRIPT_DIR_TEMP}/${SCRIPT_UNIQ}.lock"
+echo "SCRIPT_DIR_LOCK is ${SCRIPT_DIR_LOCK}"
+SCRIPT_TIMELOG_FLAG=0
+echo "SCRIPT_TIMELOG_FLAG is ${SCRIPT_TIMELOG_FLAG}"
+SCRIPT_TIMELOG_FORMAT="+%y/%m/%d@%H:%M:%S"
+echo "SCRIPT_TIMELOG_FORMAT is ${SCRIPT_TIMELOG_FORMAT}"
+SCRIPT_TIMELOG_FORMAT_PERL="$(echo ${SCRIPT_TIMELOG_FORMAT#+} | sed 's/%y/%Y/g')"
+echo "SCRIPT_TIMELOG_FORMAT_PERL is ${SCRIPT_TIMELOG_FORMAT_PERL}"
+HOSTNAME="$(hostname)"
+echo "HOSTNAME is ${HOSTNAME}"
+FULL_COMMAND="${0} $*"
+echo "FULL_COMMAND is ${FULL_COMMAND}"
+FULL_COMMAND="${0} $*"
+echo "FULL_COMMAND is ${FULL_COMMAND}"
+EXEC_DATE=$(date "+%y%m%d%H%M%S")
+echo "EXEC_DATE is ${EXEC_DATE}"
+EXEC_ID=${$}
+echo "EXEC_ID is ${EXEC_ID}"
+GNU_AWK_FLAG="$(gawk --version 2>/dev/null | head -1 | grep GNU)"
+echo "GNU_AWK_FLAG is ${GNU_AWK_FLAG}"
+PERL_FLAG="$(perl -v 1>/dev/null 2>&1 && echo 1)"
+echo "PERL_FLAG is ${PERL_FLAG}"
+
+  #== file variables ==#
+filePid="${SCRIPT_DIR_LOCK}/pid"
+fileLog="/dev/null"
+
+  #== function variables ==#
+ipcf_file="${SCRIPT_DIR_LOCK}/${SCRIPT_UNIQ_DATED}.tmp.ipcf";
+ipcf_IFS="|" ; ipcf_return="" ;
+rc=0 ; countErr=0 ; countWrn=0 ;
+
+  #== option variables ==#
+flagOptErr=0
+flagOptLog=0
+flagOptTimeLog=0
+flagOptIgnoreLock=0
+
+flagTmp=0
+flagDbg=1
+flagScriptLock=0
+flagMainScriptStart=0
+#============================
+#  TRAPS
+#============================
+trap 'error "${SCRIPT_NAME}: FATAL ERROR at $(date "+%HH%M") (${SECONDS}s): Interrupt signal intercepted! Exiting now..."
+	2>&1 | tee -a ${fileLog:-/dev/null} >&2 ;
+	exit 99;' INT QUIT TERM
+
+trap 'cleanup' EXIT
+
+#============================
+#  FUNCTIONS
+#============================
+  #== fecho function ==#
+fecho() {
+	_Type=${1} ; shift ;
+	[[ ${SCRIPT_TIMELOG_FLAG:-0} -ne 0 ]] && printf "$( date ${SCRIPT_TIMELOG_FORMAT} ) "
+	printf "[${_Type%[A-Z][A-Z]}] ${*}\n"
+	if [[ "${_Type}" = CAT ]]; then
+		_Tag="[O]"
+		[[ "$1" == \[*\] ]] && _Tag="${_Tag} ${1}"
+		if [[ ${SCRIPT_TIMELOG_FLAG:-0} -eq 0 ]]; then
+			cat -un - | awk '$0="'"${_Tag}"' "$0; fflush();' ;
+		elif [[ "${GNU_AWK_FLAG}" ]]; then # fast - compatible linux
+			cat -un - | awk -v tformat="${SCRIPT_TIMELOG_FORMAT#+} " '$0=strftime(tformat)"'"${_Tag}"' "$0; fflush();' ;
+		elif [[ "${PERL_FLAG}" ]]; then # fast - if perl installed
+			cat -un - | perl -pne 'use POSIX qw(strftime); print strftime "'${SCRIPT_TIMELOG_FORMAT_PERL}' ' "${_Tag}"' ", gmtime();'
+		else # average speed but resource intensive- compatible unix/linux
+			cat -un - | while read LINE; do \
+				[[ ${OLDSECONDS:=$(( ${SECONDS}-1 ))} -lt ${SECONDS} ]] && OLDSECONDS=$(( ${SECONDS}+1 )) \
+				&& TSTAMP="$( date ${SCRIPT_TIMELOG_FORMAT} ) "; printf "${TSTAMP}${_Tag} ${LINE}\n"; \
+			done 
+		fi
+	fi
+}
+
+  #== custom function ==#
+check_cre_file() {
+	_File=${1}
+	_Script_Func_name="${SCRIPT_NAME}: check_cre_file"
+	[[ "x${_File}" = "x" ]] && error "${_Script_Func_name}: No parameter" && return 1
+	[[ "${_File}" = "/dev/null" ]] && return 0
+	[[ -e ${_File} ]] && error "${_Script_Func_name}: ${_File}: File already exists" && return 2
+	touch ${_File} 1>/dev/null 2>&1
+	[[ $? -ne 0 ]] && error "${_Script_Func_name}: ${_File}: Cannot create file" && return 3
+	rm -f ${_File} 1>/dev/null 2>&1
+	[[ $? -ne 0 ]] && error "${_Script_Func_name}: ${_File}: Cannot delete file" && return 4
+	return 0
+}
+
 
 # define internal flags
 CSV=0    # csv output: off
@@ -91,3 +361,48 @@ COLUMNS=2000 dpkg -l | grep '^.[iufhwt]' | while read pState package pVer pArch 
   fi 
 done
 
+# -----------------------------------------------------------------
+#  SCRIPT LOGIC GOES HERE
+# -----------------------------------------------------------------
+  #== Main part ==#
+  #===============#
+# a2x -f xhtml -v -a toc -a numbered -L php-introduction.adoc
+main () {
+  res1=$(date +%s.%N)  # store moment when processing begins
+  process_options "$@" # call function to process options
+  process_lock         # call function to process lock file
+
+  # do your stuff here
+  asciidoctor-pdf -a toc -a numbered -r asciidoctor-diagram "${in_file}"
+  
+} # end of main
+
+
+main "$@"
+
+exit 0
+# A zero return value from the script on exit indicates success to the shell.
+
+# sudo apt install parallel
+# parallel tutorial https://zenodo.org/record/1146014
+parallel --jobs 24 \
+         --dry-run  \
+    curl             \
+         ftps://a.b.c.d/node7-{1}/{1}-{2}/{1}-{2}-{3}-{4}_*.jpg \
+    ::: "LKLN" "LKRO" "LKPM"                                     \
+    ::: $( seq -f "%04g" 2011 2020 )                              \
+    ::: $( seq -f "%02g" 4  6 )                                    \
+    ::: $( seq -f "%02g" 1 31 )                                     \
+
+will yield a demo of :
+
+...
+curl ftps://a.b.c.d/node7-LKLN/LKLN-2020/LKLN-2020-06-29_*.jpg
+curl ftps://a.b.c.d/node7-LKLN/LKLN-2020/LKLN-2020-06-30_*.jpg
+curl ftps://a.b.c.d/node7-LKLN/LKLN-2020/LKLN-2020-06-31_*.jpg
+curl ftps://a.b.c.d/node7-LKRO/LKRO-2011/LKRO-2011-04-01_*.jpg
+curl ftps://a.b.c.d/node7-LKRO/LKRO-2011/LKRO-2011-04-02_*.jpg
+curl ftps://a.b.c.d/node7-LKRO/LKRO-2011/LKRO-2011-04-03_*.jpg
+...
+
+https://stackoverflow.com/questions/35750221/efficient-method-for-parallel-processing-in-bash-shell?rq=3
