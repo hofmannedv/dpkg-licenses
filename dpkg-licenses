@@ -7,14 +7,15 @@
 #+    ${SCRIPT_NAME} [-hcv] [-i [file]]
 #%
 #% DESCRIPTION
-#%    
+#%    A command line tool which lists the licenses of all installed packages in a Debian-based system (like Ubuntu)
 #%    
 #%    
 #%
 #% OPTIONS
-#%    -i [file], --output=[file]    Set input source file
-#%    -h, --help                    Print this help
-#%    -v, --version                 Print script information
+#%    -i [file]       Set input source file
+#%    --output=[file] Set output source file
+#%    -h, --help      Print this help
+#%    -v, --version   Print script information
 #%
 #% EXAMPLES
 #%    ${SCRIPT_NAME} -i 
