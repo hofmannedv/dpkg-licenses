@@ -22,7 +22,7 @@
 #%
 #% PREREQUISITES
 #% https://www.gnu.org/software/parallel/
-#% sudo apt install parallel, awk
+#% sudo apt install parallel, awk, bc, gawk, grep, coreutils (cut, head, readlink, rm, test, tr ), 
 #% 
 #% GNU parallel uses Perl, and the Perl modules Getopt::Long, IPC::Open3, Symbol, IO::File, POSIX, and File::Temp.
 #% For --csv it uses the Perl module Text::CSV.
