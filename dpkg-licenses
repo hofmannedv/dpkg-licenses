@@ -196,7 +196,7 @@ fileLog="/dev/null"
 
   #== function variables ==#
 ipcf_file="${SCRIPT_DIR_LOCK}/${SCRIPT_UNIQ_DATED}.tmp.ipcf";
-ipcf_IFS="|" ; ipcf_return="" ;
+ipcf_IFS="|" ; ipcf_return="" ;    # internal field separator 
 rc=0 ; countErr=0 ; countWrn=0 ;
 
   #== option variables ==#
