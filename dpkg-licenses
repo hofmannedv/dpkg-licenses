@@ -97,15 +97,15 @@ script_path() {
 
 mydebug_info(){
   echo "pwd: `pwd`"
-  echo "\$0: $0"
+  echo "\$0: $0"                      # Variable $0 always holds the name of the script
   echo "basename: `basename $0`"
   echo "dirname: `dirname $0`"
   echo "dirname/readlink: $(dirname $(readlink -f $0))"
   script_path
 ### Print total arguments and their values
  
-  echo "Total Arguments:" $#
-  echo "All Arguments values:" $@
+  echo "Total Arguments:" $#          # variable $# holds the number of parameters provided on the command line
+  echo "All Arguments values:" $@     # Variable $@ is a string that contains all of the command line parameters
 }
 
 # -----------------------------------------------------------------
