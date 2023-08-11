@@ -352,6 +352,7 @@ main "$@"
 exit 0
 # A zero return value from the script on exit indicates success to the shell.
 
+# cleanup needs to be defined
 
 # parallel tutorial https://zenodo.org/record/1146014
 parallel --jobs 24 \
