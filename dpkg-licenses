@@ -47,7 +47,7 @@
 #
 #    This file is part of dpkg-licenses.
 #
-#    dpkg-licenses was written by Daniel Alder, https://github.com/daald
+#    dpkg-licenses was originally written by Daniel Alder, https://github.com/daald
 #
 #    dpkg-licenses is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -69,7 +69,9 @@
 #
 #  DEBUG OPTION
 #    set -n  # Uncomment to check your syntax, without execution.
-#    set -x  # Uncomment to debug this shell script
+#    set -x  # Uncomment to debug this shell script. Bash prints each command before executing
+#              Arguments are expanded before a command is printed so logs show argument values
+#              at time of execution
 #================================================================
 # END_OF_HEADER
 #================================================================
@@ -214,7 +216,7 @@ flagMainScriptStart=0
 #============================
 trap 'error "${SCRIPT_NAME}: FATAL ERROR at $(date "+%HH%M") (${SECONDS}s): Interrupt signal intercepted! Exiting now..."
 	2>&1 | tee -a ${fileLog:-/dev/null} >&2 ;
-	exit 99;' INT QUIT TERM
+	exit 99;' INT TERM ERR QUIT
 
 trap 'cleanup' EXIT
 
@@ -353,6 +355,7 @@ exit 0
 # A zero return value from the script on exit indicates success to the shell.
 
 # cleanup needs to be defined
+# process_options needs to be defined
 
 # parallel tutorial https://zenodo.org/record/1146014
 parallel --jobs 24 \
