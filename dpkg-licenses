@@ -218,6 +218,9 @@ trap 'error "${SCRIPT_NAME}: FATAL ERROR at $(date "+%HH%M") (${SECONDS}s): Inte
 	2>&1 | tee -a ${fileLog:-/dev/null} >&2 ;
 	exit 99;' INT TERM ERR QUIT
 
+function cleanup(){
+    echo "cleanup does nothing yet"
+    }
 trap 'cleanup' EXIT
 
 #============================
