@@ -13,8 +13,7 @@
 #%
 #% DESCRIPTION
 #%    A command line tool which lists the licenses of all installed packages in a Debian-based system
-#%    
-#%    
+#%   
 #%
 #% OPTIONS
 #%    -i [file]       Set input source file
@@ -27,8 +26,9 @@
 #%
 #% PREREQUISITES
 #% https://www.gnu.org/software/parallel/
-#% sudo apt install parallel, awk, bc, gawk, grep, coreutils (cut, head, readlink, rm, test, tr ), 
-#% 
+#% sudo apt install parallel, awk, bc, gawk, grep, coreutils 
+#%
+#% Note: coreutils contains the commands (cut, head, readlink, rm, test, tr )
 #% GNU parallel uses Perl, and the Perl modules Getopt::Long, IPC::Open3, Symbol, IO::File, POSIX, and File::Temp.
 #% For --csv it uses the Perl module Text::CSV.
 #% For remote usage it uses rsync with ssh.
